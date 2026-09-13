@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>高数公式 + 例题 + 随机测验</title>
+<style>
+  :root{
+    --bg:#f5f7fa; --card:#ffffff; --text:#2b3445; --muted:#8a94a6;
+    --primary:#3b82f6; --primary-soft:#e8f1fe; --danger:#ef4444;
+    --star:#f5b301; --border:#e5e9f0; --radius:14px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    font-size:15px; line-height:1.6; padding-bottom:40px;
+  }
+  header{
+    position:sticky; top:0; z-index:20;
+    background:var(--card); border-bottom:1px solid var(--border);
+  }
+  .app-title{
+    max-width:640px; margin:0 auto; padding:12px 16px 4px;
+    font-size:18px; font-weight:700;
+  }
+  nav{max-width:640px; margin:0 auto; display:flex; overflow-x:auto; padding:6px 8px 10px; gap:6px;}
+  nav::-webkit-scrollbar{display:none;}
+  .nav-btn{
+    flex:0 0 auto; min-height:40px; padding:6px 14px; border:none; border-radius:20px;
+    background:transparent; color:var(--muted); font-size:14px; font-weight:600; cursor:pointer;
+  }
+  .nav-btn.active{background:var(--primary); color:#fff;}
+  main{max-width:640px; margin:0 auto; padding:12px;}
+  .tab-page{display:none;}
+  .toolbar{display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;}
+  .search-input{
+    flex:1 1 160px; min-height:44px; padding:8px 12px; border:1px solid var(--border);
+    border-radius:10px; font-size:16px; background:var(--card); outline:none;
+  }
+  .search-input:focus{border-color:var(--primary);}
+  select{
+    min-height:44px; padding:8px 10px; border:1px solid var(--border); border-radius:10px;
+    font-size:16px; background:var(--card); color:var(--text); outline:none;
+  }
+  .chip-toggle{
+    min-height:44px; padding:8px 14px; border:1px solid var(--border); border-radius:10px;
+    background:var(--card); color:var(--muted); font-size:14px; font-weight:600; cursor:pointer;
+  }
+  .chip-toggle.active{background:#fff7e0; border-color:var(--star); color:#b07d00;}
+  .card{
+    background:var(--card); border-radius:var(--radius); padding:14px;
+    box-shadow:0 1px 4px rgba(30,40,70,.06); margin-bottom:12px;
+  }
+  .card-head{display:flex; justify-content:space-between; align-items:flex-start; gap:8px;}
+  .card-title{font-weight:700; font-size:16px;}
+  .badge{
+    display:inline-block; font-size:12px; font-weight:600; color:var(--primary);
+    background:var(--primary-soft); border-radius:8px; padding:2px 8px; margin-left:6px; vertical-align:2px;
+  }
+  .star-btn{
+    border:none; background:transparent; font-size:22px; line-height:1; cursor:pointer;
+    min-width:40px; min-height:40px;
+  }
+  .formula-box{
+    background:#f4f7ff; border:1px solid #dfe8fb; border-radius:10px;
+    padding:10px 12px; margin:10px 0 4px; font-size:15px; word-break:break-all;
+  }
+  .note{font-size:13px; color:var(--muted); margin-top:8px; word-break:break-all;}
+  .tags{margin-top:8px; display:flex; flex-wrap:wrap; gap:6px;}
+  .tag{
+    font-size:12px; color:#5b6b84; background:#eef2f7; border-radius:8px; padding:2px 8px;
+  }
+  .btn-row{display:flex; gap:8px; margin-top:12px;}
+  .btn{
+    flex:1; min-height:44px; border:none; border-radius:10px; font-size:15px; font-weight:600;
+    cursor:pointer; padding:8px 12px;
+  }
+  .btn-primary{background:var(--primary); color:#fff;}
+  .btn-danger{background:#fee2e2; color:var(--danger);}
+  .btn-danger.armed{background:var(--danger); color:#fff;}
+  .btn-ghost{background:#eef2f7; color:var(--text);}
+  .btn-sm{flex:0 0 auto; min-height:40px; font-size:13px; padding:6px 12px;}
+  .btn:disabled{opacity:.45; cursor:not-allowed;}
+  .empty{text-align:center; padding:40px 16px; color:var(--muted);}
+  .empty .big{font-size:44px; display:block; margin-bottom:10px;}
+  .hint{font-size:13px; color:var(--muted);}
+  .section-title{font-size:14px; font-weight:700; color:var(--muted); margin:16px 4px 8px;}
+  .q-text{font-size:16px; margin:10px 0; word-break:break-all;}
+  .ans-block{border-top:1px dashed var(--border); margin-top:10px; padding-top:10px;}
+  .ans-block h4{font-size:13px; color:var(--muted); margin:10px 0 4px;}
+  .step{padding:4px 0; font-size:14px; word-break:break-all;}
+  .pit{color:#b45309; font-size:14px; word-break:break-all;}
+  .stats-line{
+    font-size:14px; color:var(--text); background:#f4f7ff; border-radius:10px;
+    padding:10px 12px; margin-top:10px; word-break:break-all;
+  }
+  .modal-overlay{
+    display:none; position:fixed; inset:0; background:rgba(20,28,45,.45); z-index:50;
+    align-items:flex-end; justify-content:center;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal-box{
+    background:var(--card); width:100%; max-width:640px; max-height:88vh; overflow-y:auto;
+    border-radius:18px 18px 0 0; padding:18px 16px 24px;
+  }
+  .modal-title{font-size:17px; font-weight:700; margin-bottom:14px;}
+  .form-row{margin-bottom:12px;}
+  .form-row label{display:block; font-size:13px; color:var(--muted); margin-bottom:4px;}
+  .form-row input,.form-row select,.form-row textarea{
+    width:100%; min-height:44px; padding:10px 12px; border:1px solid var(--border);
+    border-radius:10px; font-size:16px; font-family:inherit; background:#fff; outline:none;
+  }
+  .form-row textarea{min-height:80px; resize:vertical;}
+  .form-row input:focus,.form-row textarea:focus,.form-row select:focus{border-color:var(--primary);}
+  #toast{
+    position:fixed; left:50%; bottom:60px; transform:translateX(-50%) translateY(20px);
+    background:#2b3445; color:#fff; padding:10px 18px; border-radius:24px; font-size:14px;
+    opacity:0; pointer-events:none; transition:all .25s; z-index:99; max-width:86vw; text-align:center;
+  }
+  #toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  .import-row{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
+  .import-row .btn{flex:1 1 40%;}
+  .file-label{
+    display:block; font-size:13px; color:var(--muted); margin-bottom:6px;
+  }
+  input[type=file]{font-size:13px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="app-title">📐 高数公式 + 例题 + 随机测验</div>
+  <nav>
+    <button class="nav-btn active" data-tab="formulas">📚 公式库</button>
+    <button class="nav-btn" data-tab="examples">📝 例题库</button>
+    <button class="nav-btn" data-tab="quiz">🎲 随机测验</button>
+    <button class="nav-btn" data-tab="fav">⭐ 收藏</button>
+    <button class="nav-btn" data-tab="settings">⚙️ 设置</button>
+  </nav>
+</header>
+
+<main>
+  <!-- 公式库 -->
+  <section class="tab-page" id="tab-formulas">
+    <div class="toolbar">
+      <input class="search-input" id="f-search" placeholder="🔍 搜索名称 / 公式 / 说明 / 标签">
+      <select id="f-cat"></select>
+      <button class="chip-toggle" id="f-favbtn">⭐ 收藏</button>
+    </div>
+    <div class="btn-row" style="margin-bottom:12px;">
+      <button class="btn btn-primary" onclick="openFormulaModal()">➕ 添加公式</button>
+    </div>
+    <div id="f-count" class="hint" style="margin:0 4px 8px;"></div>
+    <div id="formula-list"></div>
+  </section>
+
+  <!-- 例题库 -->
+  <section class="tab-page" id="tab-examples">
+    <div class="toolbar">
+      <input class="search-input" id="e-search" placeholder="🔍 搜索题目 / 答案 / 标签">
+      <select id="e-cat"></select>
+    </div>
+    <div class="btn-row" style="margin-bottom:12px;">
+      <button class="btn btn-primary" onclick="openExampleModal()">➕ 添加例题</button>
+    </div>
+    <div id="e-count" class="hint" style="margin:0 4px 8px;"></div>
+    <div id="example-list"></div>
+  </section>
+
+  <!-- 随机测验 -->
+  <section class="tab-page" id="tab-quiz">
+    <div class="card">
+      <div class="card-title">🎯 随机测验</div>
+      <div class="form-row" style="margin-top:10px;">
+        <label>题库范围</label>
+        <select id="quiz-scope" style="width:100%;"></select>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="startQuiz()">🎲 开始新一轮</button>
+      </div>
+      <div class="stats-line" id="quiz-stats"></div>
+    </div>
+    <div id="quiz-area"></div>
+  </section>
+
+  <!-- 收藏 -->
+  <section class="tab-page" id="tab-fav">
+    <div id="fav-area"></div>
+  </section>
+
+  <!-- 设置 -->
+  <section class="tab-page" id="tab-settings">
+    <div class="card">
+      <div class="card-title">📊 数据统计</div>
+      <div class="stats-line" id="settings-stats"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📤 导出数据</div>
+      <p class="hint" style="margin-top:6px;">将全部公式、例题与测验记录导出为 JSON 文件备份。</p>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="exportData()">💾 导出 JSON</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📥 导入数据</div>
+      <label class="file-label" for="import-file" style="margin-top:6px;">选择 JSON 备份文件：</label>
+      <input type="file" id="import-file" accept=".json,application/json" onchange="onImportFile(this)">
+      <div class="import-row">
+        <button class="btn btn-ghost" id="btn-merge" disabled onclick="mergeImport()">🔗 合并导入</button>
+        <button class="btn btn-danger" id="btn-overwrite" disabled onclick="overwriteImport()">♻️ 覆盖导入</button>
+      </div>
+      <p class="hint" style="margin-top:8px;">合并：保留现有数据，追加导入的不重复条目；覆盖：用导入数据完全替换现有数据。</p>
+    </div>
+    <div class="card">
+      <div class="card-title">🗑️ 危险区</div>
+      <p class="hint" style="margin-top:6px;">清空所有公式、例题和测验记录，操作不可恢复。</p>
+      <div class="btn-row">
+        <button class="btn btn-danger" id="btn-clear" onclick="clearAll()">🗑️ 清空所有数据</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-box" id="modal-box"></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+/* ================= 基础 ================= */
+var KEY = 'math_formula_v1';
+var CATS = ['函数与极限','导数与微分','微分中值定理','不定积分','定积分','微分方程'];
+
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function genId(p){
+  return p + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+}
+function normCat(c){ return CATS.indexOf(c) >= 0 ? c : CATS[0]; }
+function safeId(v, p){
+  return (typeof v === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(v)) ? v : genId(p);
+}
+function normF(f){
+  return {
+    id: safeId(f && f.id, 'f'),
+    name: String((f && f.name) || '').trim() || '未命名公式',
+    cat: normCat(f && f.cat),
+    content: String((f && f.content) || ''),
+    note: String((f && f.note) || ''),
+    variants: String((f && f.variants) || ''),
+    tags: String((f && f.tags) || ''),
+    fav: !!(f && f.fav)
+  };
+}
+function normE(e){
+  return {
+    id: safeId(e && e.id, 'e'),
+    title: String((e && e.title) || '').trim() || '未命名例题',
+    cat: normCat(e && e.cat),
+    question: String((e && e.question) || ''),
+    steps: String((e && e.steps) || ''),
+    answer: String((e && e.answer) || ''),
+    pitfall: String((e && e.pitfall) || ''),
+    tags: String((e && e.tags) || ''),
+    fav: !!(e && e.fav)
+  };
+}
+
+/* ================= 预置公式数据 ================= */
+var SEED_F = [
+{name:'第一个重要极限',cat:'函数与极限',content:'lim(x→0) sin x / x = 1',note:'x→0 时 sin x 与 x 等价，是等价无穷小替换的源头',variants:'lim(x→0) tan x / x = 1；lim(x→∞) x·sin(1/x) = 1',tags:'极限,重要极限'},
+{name:'第二个重要极限',cat:'函数与极限',content:'lim(x→∞) (1+1/x)^x = e',note:'属于 1^∞ 型，取对数或凑标准形处理',variants:'lim(x→0) (1+x)^(1/x) = e；lim(x→∞) (1+k/x)^x = e^k',tags:'极限,重要极限,e'},
+{name:'极限四则运算法则',cat:'函数与极限',content:'lim(f±g) = lim f ± lim g；lim(f·g) = lim f · lim g；lim(f/g) = lim f / lim g（lim g ≠ 0）',note:'前提：各自极限存在，商的分母极限不为 0',variants:'',tags:'极限,运算法则'},
+{name:'夹逼准则',cat:'函数与极限',content:'若 yₙ ≤ xₙ ≤ zₙ，且 lim yₙ = lim zₙ = a，则 lim xₙ = a',note:'常用于含 sin、1/n 等有界量的极限',variants:'函数形式同样成立',tags:'极限,夹逼准则'},
+{name:'单调有界准则',cat:'函数与极限',content:'单调有界数列必有极限',note:'证明数列收敛的常用工具',variants:'',tags:'极限,收敛,数列'},
+{name:'等价无穷小替换',cat:'函数与极限',content:'x→0 时：x ~ sin x ~ tan x ~ arcsin x ~ arctan x ~ ln(1+x) ~ e^x − 1',note:'乘除因子可直接替换，加减运算中慎用',variants:'1 − cos x ~ x²/2；(1+x)^α − 1 ~ αx；√(1+x) − 1 ~ x/2；a^x − 1 ~ x·ln a',tags:'极限,等价无穷小'},
+{name:'洛必达法则',cat:'函数与极限',content:'lim f(x)/g(x) = lim f′(x)/g′(x)（适用于 0/0 或 ∞/∞ 型）',note:'每次使用前必须验证是否仍为未定式',variants:'与等价无穷小、泰勒展开结合使用更高效',tags:'极限,洛必达'},
+{name:'无穷小的比较',cat:'函数与极限',content:'设 lim β/α = c：c=0 时 β 是 α 的高阶无穷小，记 β = o(α)；c≠0 时同阶；c=1 时等价',note:'阶数比较是泰勒展开与敛散性分析的基础',variants:'若 lim β/α^k = c ≠ 0，则 β 是 α 的 k 阶无穷小',tags:'极限,无穷小'},
+{name:'函数连续的定义',cat:'函数与极限',content:'lim(x→x₀) f(x) = f(x₀)',note:'左极限 = 右极限 = 函数值',variants:'间断点分类：可去、跳跃、无穷、振荡',tags:'连续,极限'},
+{name:'闭区间上连续函数的性质',cat:'函数与极限',content:'最值定理：连续函数在闭区间上必取得最大值与最小值；介值定理与零点定理',note:'零点定理：f(a)·f(b) < 0 ⇒ 在 (a,b) 内存在零点',variants:'介值定理：可取到介于最小值与最大值之间的一切值',tags:'连续,零点定理,介值定理'},
+{name:'泰勒（麦克劳林）公式',cat:'函数与极限',content:'f(x) = f(0) + f′(0)x + f″(0)x²/2! + … + f⁽ⁿ⁾(0)xⁿ/n! + o(xⁿ)',note:'带佩亚诺余项，用于求极限与局部展开',variants:'拉格朗日余项：f⁽ⁿ⁺¹⁾(ξ)·xⁿ⁺¹/(n+1)!',tags:'泰勒展开,极限'},
+{name:'e^x 的展开式',cat:'函数与极限',content:'e^x = 1 + x + x²/2! + x³/3! + … + xⁿ/n! + o(xⁿ)',note:'x→0 时的麦克劳林展开',variants:'e^x − 1 ~ x（x→0）',tags:'泰勒展开,指数'},
+{name:'sin x 的展开式',cat:'函数与极限',content:'sin x = x − x³/3! + x⁵/5! − … + (−1)ⁿ·x^(2n+1)/(2n+1)! + o(x^(2n+2))',note:'奇函数，只含奇次幂',variants:'',tags:'泰勒展开,三角函数'},
+{name:'cos x 的展开式',cat:'函数与极限',content:'cos x = 1 − x²/2! + x⁴/4! − … + (−1)ⁿ·x^(2n)/(2n)! + o(x^(2n+1))',note:'偶函数，只含偶次幂',variants:'',tags:'泰勒展开,三角函数'},
+{name:'ln(1+x) 的展开式',cat:'函数与极限',content:'ln(1+x) = x − x²/2 + x³/3 − … + (−1)^(n−1)·xⁿ/n + o(xⁿ)',note:'定义域 −1 < x ≤ 1',variants:'',tags:'泰勒展开,对数'},
+{name:'(1+x)^α 的展开式',cat:'函数与极限',content:'(1+x)^α = 1 + αx + α(α−1)x²/2! + … + C(α,n)·xⁿ + o(xⁿ)',variants:'√(1+x) = 1 + x/2 − x²/8 + …',tags:'泰勒展开,二项式'},
+{name:'几何级数展开',cat:'函数与极限',content:'1/(1−x) = 1 + x + x² + … + xⁿ + …（|x| < 1）',variants:'1/(1+x) = 1 − x + x² − x³ + …',tags:'泰勒展开,级数'},
+{name:'导数的定义',cat:'导数与微分',content:'f′(x₀) = lim(Δx→0) [f(x₀+Δx) − f(x₀)] / Δx',note:'左右导数存在且相等才可导；可导必连续',variants:'f′(x₀) = lim(x→x₀) [f(x) − f(x₀)] / (x − x₀)',tags:'导数,定义'},
+{name:'幂函数求导',cat:'导数与微分',content:'(xⁿ)′ = n·x^(n−1)',variants:'(√x)′ = 1/(2√x)；(1/x)′ = −1/x²；(C)′ = 0',tags:'导数,幂函数'},
+{name:'三角函数求导',cat:'导数与微分',content:'(sin x)′ = cos x；(cos x)′ = −sin x；(tan x)′ = sec²x；(cot x)′ = −csc²x；(sec x)′ = sec x·tan x；(csc x)′ = −csc x·cot x',variants:'',tags:'导数,三角函数'},
+{name:'指数函数求导',cat:'导数与微分',content:'(e^x)′ = e^x；(a^x)′ = a^x·ln a（a > 0，a ≠ 1）',variants:'',tags:'导数,指数'},
+{name:'对数函数求导',cat:'导数与微分',content:'(ln x)′ = 1/x；(log_a x)′ = 1/(x·ln a)',variants:'(ln|x|)′ = 1/x',tags:'导数,对数'},
+{name:'反三角函数求导',cat:'导数与微分',content:'(arcsin x)′ = 1/√(1−x²)；(arccos x)′ = −1/√(1−x²)；(arctan x)′ = 1/(1+x²)；(arccot x)′ = −1/(1+x²)',variants:'',tags:'导数,反三角'},
+{name:'四则运算求导法则',cat:'导数与微分',content:'(u±v)′ = u′ ± v′；(uv)′ = u′v + uv′；(u/v)′ = (u′v − uv′)/v²（v ≠ 0）',variants:'',tags:'导数,法则'},
+{name:'链式法则（复合函数求导）',cat:'导数与微分',content:'[f(g(x))]′ = f′(g(x))·g′(x)',note:'由外向内逐层求导，层层相乘',variants:'dy/dx = (dy/du)·(du/dx)',tags:'导数,复合函数,链式法则'},
+{name:'反函数求导法则',cat:'导数与微分',content:'[f⁻¹(x)]′ = 1 / f′(f⁻¹(x))',note:'反函数的导数是原函数导数的倒数',variants:'由 x = sin y 可推出 (arcsin x)′ = 1/√(1−x²)',tags:'导数,反函数'},
+{name:'隐函数求导',cat:'导数与微分',content:'方程 F(x,y) = 0 两边对 x 求导，把 y 看作 x 的函数，解出 y′',note:'含 y 的项求导时要用链式法则乘 y′',variants:'可先取对数再求导简化运算',tags:'导数,隐函数'},
+{name:'参数方程求导',cat:'导数与微分',content:'dy/dx = (dy/dt) / (dx/dt)',variants:'二阶导：d²y/dx² = [d(dy/dx)/dt] / (dx/dt)',tags:'导数,参数方程'},
+{name:'微分的定义',cat:'导数与微分',content:'dy = f′(x)·dx',note:'当 |Δx| 很小时 Δy ≈ dy，用于近似计算：f(x₀+Δx) ≈ f(x₀) + f′(x₀)·Δx',variants:'',tags:'微分,近似计算'},
+{name:'莱布尼茨公式',cat:'导数与微分',content:'(uv)⁽ⁿ⁾ = Σ C(n,k)·u⁽ⁿ⁻ᵏ⁾·v⁽ᵏ⁾（k = 0,1,…,n）',note:'乘积的高阶导数，形式类似二项式定理',variants:'',tags:'高阶导数,莱布尼茨'},
+{name:'常用高阶导数',cat:'导数与微分',content:'(sin x)⁽ⁿ⁾ = sin(x + nπ/2)；(cos x)⁽ⁿ⁾ = cos(x + nπ/2)；(e^(ax))⁽ⁿ⁾ = aⁿ·e^(ax)；[1/(x+a)]⁽ⁿ⁾ = (−1)ⁿ·n!/(x+a)^(n+1)；[ln(1+x)]⁽ⁿ⁾ = (−1)^(n−1)·(n−1)!/(1+x)ⁿ',variants:'',tags:'高阶导数'},
+{name:'对数求导法',cat:'导数与微分',content:'幂指函数 y = u^v：两边取对数 ln y = v·ln u，再对 x 求导',note:'适用于 x^x、x^(1/x) 及多个因子乘除开方的函数',variants:'',tags:'导数,幂指函数,对数求导'},
+{name:'罗尔定理',cat:'微分中值定理',content:'若 f 在 [a,b] 连续、在 (a,b) 可导，且 f(a) = f(b)，则存在 ξ∈(a,b) 使 f′(ξ) = 0',note:'连续、可导、端点值相等，三个条件缺一不可',variants:'',tags:'中值定理,罗尔'},
+{name:'拉格朗日中值定理',cat:'微分中值定理',content:'f(b) − f(a) = f′(ξ)·(b − a)，ξ ∈ (a,b)',note:'连接函数增量与导数的桥梁',variants:'有限增量公式：f(x+Δx) − f(x) = f′(x + θΔx)·Δx（0 < θ < 1）',tags:'中值定理,拉格朗日'},
+{name:'柯西中值定理',cat:'微分中值定理',content:'[f(b) − f(a)] / [g(b) − g(a)] = f′(ξ) / g′(ξ)（g′(x) ≠ 0）',note:'拉格朗日中值定理的推广，取 g(x) = x 即得拉格朗日',variants:'',tags:'中值定理,柯西'},
+{name:'单调性判定',cat:'微分中值定理',content:'在区间内 f′(x) > 0 ⇒ f 严格递增；f′(x) < 0 ⇒ f 严格递减',variants:'f′(x) ≥ 0 且驻点有限时仍单调不减',tags:'单调性'},
+{name:'极值的判定',cat:'微分中值定理',content:'第一充分条件：f′ 在 x₀ 两侧变号（左正右负为极大）；第二充分条件：f′(x₀) = 0 且 f″(x₀) < 0 为极大值，f″(x₀) > 0 为极小值',variants:'导数不存在的点也可能是极值点',tags:'极值,判定'},
+{name:'凹凸性与拐点',cat:'微分中值定理',content:'f″(x) > 0 ⇒ 曲线是凹的（下凸）；f″(x) < 0 ⇒ 凸；f″ 变号的点为拐点',variants:'',tags:'凹凸性,拐点'},
+{name:'曲线的渐近线',cat:'微分中值定理',content:'水平渐近线：lim(x→∞) f(x) = A；垂直渐近线：lim(x→x₀) f(x) = ∞；斜渐近线：k = lim f(x)/x，b = lim [f(x) − kx]',variants:'',tags:'渐近线'},
+{name:'基本积分表（一）',cat:'不定积分',content:'∫xᵃ dx = x^(a+1)/(a+1) + C（a ≠ −1）；∫(1/x) dx = ln|x| + C；∫e^x dx = e^x + C；∫a^x dx = a^x/ln a + C',variants:'',tags:'积分,基本公式'},
+{name:'基本积分表（二）',cat:'不定积分',content:'∫sin x dx = −cos x + C；∫cos x dx = sin x + C；∫sec²x dx = tan x + C；∫csc²x dx = −cot x + C；∫sec x·tan x dx = sec x + C',variants:'∫sec x dx = ln|sec x + tan x| + C；∫csc x dx = ln|csc x − cot x| + C',tags:'积分,三角'},
+{name:'基本积分表（三）',cat:'不定积分',content:'∫dx/(1+x²) = arctan x + C；∫dx/√(1−x²) = arcsin x + C；∫dx/(a²+x²) = (1/a)·arctan(x/a) + C；∫dx/√(a²−x²) = arcsin(x/a) + C',variants:'∫dx/(x²−a²) = (1/2a)·ln|(x−a)/(x+a)| + C',tags:'积分,基本公式'},
+{name:'第一类换元法（凑微分）',cat:'不定积分',content:'∫f(φ(x))·φ′(x) dx = ∫f(u) du，其中 u = φ(x)',variants:'∫f(ax+b) dx = (1/a)·F(ax+b) + C；∫x·e^(x²) dx = ½·e^(x²) + C',tags:'积分,凑微分,换元'},
+{name:'第二类换元法（三角代换）',cat:'不定积分',content:'被积函数含 √(a²−x²) → 令 x = a·sin t；含 √(a²+x²) → 令 x = a·tan t；含 √(x²−a²) → 令 x = a·sec t',note:'代换积分后需回代为原变量',variants:'根式代换：令 t = ⁿ√(ax+b)',tags:'积分,三角代换'},
+{name:'分部积分法',cat:'不定积分',content:'∫u dv = uv − ∫v du',note:'u 的选取口诀：反、对、幂、三、指（排在前面的选作 u）',variants:'循环型积分：∫e^x·sin x dx 可联立方程求解',tags:'积分,分部积分'},
+{name:'有理函数的积分',cat:'不定积分',content:'假分式 → 多项式 + 部分分式：∑ Aᵢ/(x−a)ⁱ + ∑ (Bⱼx + Cⱼ)/(x²+px+q)ʲ',note:'分母因式分解后用待定系数法拆项',variants:'',tags:'积分,有理函数,部分分式'},
+{name:'定积分的定义',cat:'定积分',content:'∫[a,b] f(x) dx = lim(λ→0) Σ f(ξᵢ)·Δxᵢ',note:'分割、近似、求和、取极限',variants:'几何意义：曲边梯形面积的代数和',tags:'定积分,定义'},
+{name:'牛顿-莱布尼茨公式',cat:'定积分',content:'∫[a,b] f(x) dx = F(b) − F(a)，其中 F′(x) = f(x)',note:'微积分基本定理，连续函数必存在原函数',variants:'',tags:'定积分,牛顿-莱布尼茨'},
+{name:'定积分的换元法',cat:'定积分',content:'∫[a,b] f(x) dx = ∫[α,β] f(φ(t))·φ′(t) dt',note:'换元必换限',variants:'可用换元证明对称性与周期性积分公式',tags:'定积分,换元'},
+{name:'定积分的分部积分',cat:'定积分',content:'∫[a,b] u dv = [u·v]|[a,b] − ∫[a,b] v du',variants:'',tags:'定积分,分部积分'},
+{name:'对称区间上的积分',cat:'定积分',content:'∫[−a,a] f(x) dx = 0（f 为奇函数）；∫[−a,a] f(x) dx = 2∫[0,a] f(x) dx（f 为偶函数）',note:'先判断奇偶性可大幅简化计算',variants:'',tags:'定积分,奇偶性,对称'},
+{name:'周期函数的积分',cat:'定积分',content:'∫[a, a+T] f(x) dx = ∫[0, T] f(x) dx（f 以 T 为周期）',variants:'',tags:'定积分,周期性'},
+{name:'华里士（Wallis）公式',cat:'定积分',content:'∫[0,π/2] sinⁿx dx = ∫[0,π/2] cosⁿx dx = (n−1)!!/n!! ×（n 为奇数：1；n 为偶数：π/2）',note:'只需记住双阶乘结果',variants:'',tags:'定积分,华里士公式'},
+{name:'变限积分求导',cat:'定积分',content:'[∫[a,x] f(t) dt]′ = f(x)；[∫[a,φ(x)] f(t) dt]′ = f(φ(x))·φ′(x)',note:'下限含 x 时先交换上下限加负号',variants:'',tags:'变限积分,求导'},
+{name:'定积分中值定理',cat:'定积分',content:'∫[a,b] f(x) dx = f(ξ)·(b − a)，ξ ∈ [a,b]',note:'几何意义：以 f(ξ) 为高的矩形面积等于曲边梯形面积',variants:'',tags:'定积分,中值定理'},
+{name:'反常积分的敛散性',cat:'定积分',content:'∫[1,+∞) dx/xᵖ：p > 1 收敛，p ≤ 1 发散；∫[0,1] dx/xᵖ：p < 1 收敛，p ≥ 1 发散',variants:'∫[0,+∞) e^(−x) dx = 1',tags:'反常积分,敛散性'},
+{name:'定积分的几何应用',cat:'定积分',content:'平面面积 S = ∫[a,b] |f(x)| dx；旋转体体积（绕 x 轴）V = π∫[a,b] f²(x) dx',variants:'已知截面面积的立体：V = ∫A(x) dx',tags:'应用,面积,体积'},
+{name:'可分离变量方程',cat:'微分方程',content:'dy/dx = f(x)·g(y) ⇒ ∫dy/g(y) = ∫f(x) dx',note:'两边分别积分后整理通解',variants:'',tags:'微分方程,可分离变量'},
+{name:'齐次方程',cat:'微分方程',content:'dy/dx = φ(y/x)，令 u = y/x，方程化为 u + x·(du/dx) = φ(u)',note:'变量替换后化为可分离变量方程',variants:'',tags:'微分方程,齐次'},
+{name:'一阶线性微分方程',cat:'微分方程',content:'y′ + P(x)y = Q(x) ⇒ y = e^(−∫P dx)·[∫Q(x)·e^(∫P dx) dx + C]',note:'通解公式，也可用常数变易法推导',variants:'Q(x) = 0 时为齐次线性方程：y = C·e^(−∫P dx)',tags:'微分方程,一阶线性'},
+{name:'伯努利方程',cat:'微分方程',content:'y′ + P(x)y = Q(x)·yⁿ，令 z = y^(1−n) 化为一阶线性方程',variants:'',tags:'微分方程,伯努利'},
+{name:'二阶常系数齐次方程',cat:'微分方程',content:'y″ + py′ + qy = 0，特征方程 r² + pr + q = 0',note:'两不等实根：y = C₁e^(r₁x) + C₂e^(r₂x)；二重根：y = (C₁ + C₂x)e^(rx)；共轭复根 α±βi：y = e^(αx)(C₁·cos βx + C₂·sin βx)',variants:'',tags:'微分方程,二阶,特征方程'},
+{name:'二阶常系数非齐次方程',cat:'微分方程',content:'y″ + py′ + qy = f(x)，通解 = 齐次方程通解 + 特解 y*',note:'f(x) = Pₘ(x)·e^(λx) 时设 y* = xᵏ·Qₘ(x)·e^(λx)，k 为 λ 作为特征根的重数（0、1、2）',variants:'f(x) = e^(λx)(A·cos ωx + B·sin ωx) 时设同型特解',tags:'微分方程,非齐次,特解'}
+];
+
+/* ================= 预置例题数据 ================= */
+var SEED_E = [
+{title:'第一个重要极限求值',cat:'函数与极限',question:'求 lim(x→0) sin 3x / x',steps:'1. 凑形：sin 3x / x = 3 · sin 3x / (3x)\n2. 令 u = 3x，当 x→0 时 u→0\n3. 由 lim(u→0) sin u / u = 1，原式 = 3 × 1 = 3',answer:'3',pitfall:'凑重要极限时分母必须与正弦内部完全一致，漏掉系数 3 是最常见错误',tags:'极限,重要极限'},
+{title:'第二个重要极限求值',cat:'函数与极限',question:'求 lim(x→0) (1 + 2x)^(1/x)',steps:'1. 改写：(1+2x)^(1/x) = [(1+2x)^(1/(2x))]²\n2. 令 t = 2x → 0，(1+t)^(1/t) → e\n3. 原式 = e²',answer:'e²',pitfall:'指数部分要凑成标准形，外层幂次 2 别丢',tags:'极限,重要极限'},
+{title:'等价无穷小替换',cat:'函数与极限',question:'求 lim(x→0) (tan x − sin x) / x³',steps:'1. 因式分解：tan x − sin x = tan x·(1 − cos x)\n2. 等价替换：tan x ~ x，1 − cos x ~ x²/2\n3. 原式 = lim x·(x²/2) / x³ = 1/2',answer:'1/2',pitfall:'加减项中不能直接用等价无穷小，必须先因式分解成乘除结构',tags:'极限,等价无穷小'},
+{title:'洛必达法则求极限',cat:'函数与极限',question:'求 lim(x→0) (e^x − 1 − x) / x²',steps:'1. 验证：x→0 时分子分母均 → 0，属 0/0 型\n2. 洛必达：lim (e^x − 1)/(2x)\n3. 再用等价 e^x − 1 ~ x：lim x/(2x) = 1/2',answer:'1/2',pitfall:'用洛必达前必须验证未定式类型；分子求导时 −x 的导数是 −1 别漏',tags:'极限,洛必达'},
+{title:'泰勒展开求极限',cat:'函数与极限',question:'用泰勒展开求 lim(x→0) (cos x − 1 + x²/2) / x⁴',steps:'1. cos x = 1 − x²/2 + x⁴/24 + o(x⁴)\n2. 代入：cos x − 1 + x²/2 = x⁴/24 + o(x⁴)\n3. 原式 = lim x⁴/24 / x⁴ = 1/24',answer:'1/24',pitfall:'展开必须到与分母同阶（x⁴），展开阶数不够会得到错误结果',tags:'极限,泰勒展开'},
+{title:'复合函数求导',cat:'导数与微分',question:'求 y = ln(sin x) 的导数',steps:'1. 外层：y = ln u，(ln u)′ = 1/u\n2. 内层：u = sin x，u′ = cos x\n3. 链式法则：y′ = (1/sin x)·cos x = cot x',answer:'y′ = cot x',pitfall:'内层导数 cos x 容易漏乘，链式法则要逐层相乘',tags:'导数,链式法则'},
+{title:'幂指函数求导',cat:'导数与微分',question:'求 y = x^x（x > 0）的导数',steps:'1. 两边取对数：ln y = x·ln x\n2. 两边对 x 求导：y′/y = ln x + 1\n3. 所以 y′ = x^x·(ln x + 1)',answer:'y′ = x^x·(ln x + 1)',pitfall:'x^x 既不是幂函数也不是指数函数，不能套用现成公式，必须用对数求导法',tags:'导数,对数求导,幂指函数'},
+{title:'隐函数求导',cat:'导数与微分',question:'已知 x² + y² = 4，求 y′',steps:'1. 两边对 x 求导（y 是 x 的函数）：2x + 2y·y′ = 0\n2. 解出：y′ = −x/y',answer:'y′ = −x/y',pitfall:'对 y² 求导时要乘 y′（链式法则），结果中可以保留 y',tags:'导数,隐函数'},
+{title:'参数方程求导',cat:'导数与微分',question:'设 x = a(t − sin t)，y = a(1 − cos t)，求 dy/dx',steps:'1. dx/dt = a(1 − cos t)，dy/dt = a·sin t\n2. dy/dx = (dy/dt)/(dx/dt) = sin t/(1 − cos t)\n3. 用半角公式化简：= cot(t/2)',answer:'dy/dx = cot(t/2)',pitfall:'求二阶导数时还要再除以 dx/dt，不能直接对 t 求导',tags:'导数,参数方程'},
+{title:'分段函数的可导性',cat:'导数与微分',question:'讨论 f(x) = x²（x ≤ 1），2x − 1（x > 1）在 x = 1 处的连续性与可导性',steps:'1. 连续性：f(1⁻) = 1 = f(1)，f(1⁺) = 2 − 1 = 1，连续\n2. 左导数：lim(x→1⁻) (x² − 1)/(x − 1) = 2\n3. 右导数：lim(x→1⁺) (2x − 1 − 1)/(x − 1) = 2\n4. 左右导数相等，故可导且 f′(1) = 2',answer:'在 x = 1 处连续且可导，f′(1) = 2',pitfall:'判断可导必须分别验证左右导数，不能只代一侧公式',tags:'导数,分段函数,可导性'},
+{title:'求函数的极值',cat:'微分中值定理',question:'求 y = x³ − 3x 的极值',steps:'1. y′ = 3x² − 3 = 3(x² − 1)，驻点 x = ±1\n2. y″ = 6x：y″(−1) = −6 < 0，x = −1 为极大值点\n3. y″(1) = 6 > 0，x = 1 为极小值点\n4. 极大值 y(−1) = 2，极小值 y(1) = −2',answer:'极大值 2（x = −1），极小值 −2（x = 1）',pitfall:'当 f″ = 0 时第二充分条件失效，要改用第一充分条件',tags:'导数,极值'},
+{title:'利用单调性证明不等式',cat:'微分中值定理',question:'证明：当 x > 0 时，e^x > 1 + x',steps:'1. 构造 f(x) = e^x − 1 − x，f(0) = 0\n2. f′(x) = e^x − 1，当 x > 0 时 f′(x) > 0\n3. f 在 [0,+∞) 严格递增，故 x > 0 时 f(x) > f(0) = 0\n4. 即 e^x > 1 + x，得证',answer:'得证',pitfall:'构造辅助函数是关键；端点值 f(0) 必须计算',tags:'中值定理,不等式,单调性'},
+{title:'罗尔定理证明题',cat:'微分中值定理',question:'证明方程 x⁵ + x − 1 = 0 有且仅有一个正根',steps:'1. 存在性：f(x) = x⁵ + x − 1，f(0) = −1，f(1) = 1，由零点定理知存在正根\n2. 唯一性：反设有两根 x₁ < x₂，则 f(x₁) = f(x₂) = 0\n3. 由罗尔定理 ⇒ 存在 ξ 使 f′(ξ) = 0\n4. 但 f′(x) = 5x⁴ + 1 > 0 恒成立，矛盾\n5. 故正根唯一',answer:'有且仅有一个正根',pitfall:'存在性与唯一性要分开证明，两条思路不同',tags:'中值定理,罗尔定理,零点定理'},
+{title:'分部积分法',cat:'不定积分',question:'求 ∫ x·e^x dx',steps:'1. 选 u = x，dv = e^x dx（口诀：反对幂三指，幂在前选作 u）\n2. ∫x·e^x dx = x·e^x − ∫e^x dx\n3. = x·e^x − e^x + C = (x − 1)·e^x + C',answer:'(x − 1)·e^x + C',pitfall:'u、dv 选择错误会导致越积越复杂；结果别忘了 +C',tags:'不定积分,分部积分'},
+{title:'第二类换元法',cat:'不定积分',question:'求 ∫ dx/(1 + √x)',steps:'1. 令 t = √x，则 x = t²，dx = 2t·dt\n2. 原式 = ∫ 2t/(1+t) dt = ∫ [2 − 2/(1+t)] dt\n3. = 2t − 2ln(1+t) + C\n4. 回代：2√x − 2ln(1+√x) + C',answer:'2√x − 2ln(1+√x) + C',pitfall:'积分结束后必须回代为原变量 x，t 只是中间变量',tags:'不定积分,换元法'},
+{title:'凑微分法',cat:'不定积分',question:'求 ∫ sin³x·cos x dx',steps:'1. 凑微分：cos x·dx = d(sin x)\n2. 原式 = ∫ sin³x·d(sin x)\n3. = sin⁴x/4 + C',answer:'sin⁴x/4 + C',pitfall:'凑微分后要把整个被积式看成新变量的幂函数；结果可求导验证',tags:'不定积分,凑微分'},
+{title:'部分分式分解积分',cat:'不定积分',question:'求 ∫ dx/(x² − 1)',steps:'1. 因式分解：1/(x²−1) = 1/[(x−1)(x+1)]\n2. 部分分式：= ½[1/(x−1) − 1/(x+1)]\n3. 原式 = ½·ln|(x−1)/(x+1)| + C',answer:'½·ln|(x−1)/(x+1)| + C',pitfall:'待定系数求 A、B 时不要算错符号；对数内的绝对值不能漏',tags:'不定积分,有理函数,部分分式'},
+{title:'牛顿-莱布尼茨公式',cat:'定积分',question:'求 ∫[0,1] x² dx',steps:'1. 找原函数：F(x) = x³/3\n2. 牛顿-莱布尼茨：∫[0,1] x² dx = F(1) − F(0) = 1/3 − 0 = 1/3',answer:'1/3',pitfall:'先求原函数再代上下限，上下限别代反',tags:'定积分,牛顿-莱布尼茨'},
+{title:'利用奇偶性简化定积分',cat:'定积分',question:'求 ∫[−1,1] (x³ + x²) dx',steps:'1. 拆分：∫x³ dx + ∫x² dx（对称区间）\n2. x³ 为奇函数：∫[−1,1] x³ dx = 0\n3. x² 为偶函数：∫[−1,1] x² dx = 2∫[0,1] x² dx = 2/3\n4. 原式 = 0 + 2/3 = 2/3',answer:'2/3',pitfall:'必须拆开后分别判断奇偶性，整体是非奇非偶函数',tags:'定积分,奇偶性,对称区间'},
+{title:'定积分换元法',cat:'定积分',question:'求 ∫[0,4] dx/(1 + √x)',steps:'1. 令 t = √x，x = t²，dx = 2t·dt；x = 0 → t = 0，x = 4 → t = 2\n2. 原式 = ∫[0,2] 2t/(1+t) dt\n3. = [2t − 2ln(1+t)] |[0,2] = 4 − 2ln 3',answer:'4 − 2ln 3',pitfall:'换元必须同时换上下限，只换元不换限是最典型错误',tags:'定积分,换元法'},
+{title:'华里士公式',cat:'定积分',question:'求 ∫[0,π/2] sin⁴x dx',steps:'1. n = 4 为偶数\n2. 华里士公式：(n−1)!!/n!! × π/2 = (3·1)/(4·2) × π/2\n3. = 3π/16',answer:'3π/16',pitfall:'n 为偶数时才乘 π/2，奇数时不乘；双阶乘别算错',tags:'定积分,华里士公式'},
+{title:'变限积分求导',cat:'定积分',question:'设 F(x) = ∫[0,x²] e^(−t²) dt，求 F′(x)',steps:'1. 上限是 φ(x) = x²，需乘链式因子\n2. F′(x) = e^(−(x²)²)·(x²)′\n3. = 2x·e^(−x⁴)',answer:'F′(x) = 2x·e^(−x⁴)',pitfall:'上限不是单纯的 x 时必须乘 φ′(x)，漏乘是高频错误',tags:'定积分,变限积分,求导'},
+{title:'旋转体体积',cat:'定积分',question:'求曲线 y = √x 在 [0,1] 上绕 x 轴旋转一周所得旋转体的体积',steps:'1. 公式：V = π∫[0,1] f²(x) dx\n2. f²(x) = (√x)² = x\n3. V = π∫[0,1] x dx = π × 1/2 = π/2',answer:'π/2',pitfall:'公式里是 f²(x) 而不是 f(x)；绕 y 轴时公式不同',tags:'定积分,应用,体积'},
+{title:'可分离变量微分方程',cat:'微分方程',question:'求方程 y′ = 2xy 的通解',steps:'1. 分离变量：dy/y = 2x·dx\n2. 两边积分：ln|y| = x² + C₁\n3. 整理：y = C·e^(x²)（C 为任意常数）',answer:'y = C·e^(x²)',pitfall:'任意常数的写法要统一；通解不要漏掉 C = 0 的情形',tags:'微分方程,可分离变量'},
+{title:'一阶线性微分方程',cat:'微分方程',question:'求方程 y′ + y = e^x 的通解',steps:'1. P(x) = 1，Q(x) = e^x\n2. 通解公式：y = e^(−x)·[∫e^x·e^x dx + C]\n3. = e^(−x)·(e^(2x)/2 + C)\n4. = e^x/2 + C·e^(−x)',answer:'y = e^x/2 + C·e^(−x)',pitfall:'公式中 e 的指数符号容易弄反；可以代回方程验算',tags:'微分方程,一阶线性'},
+{title:'二阶常系数齐次方程',cat:'微分方程',question:'求方程 y″ − 3y′ + 2y = 0 的通解',steps:'1. 特征方程：r² − 3r + 2 = 0\n2. 因式分解：(r − 1)(r − 2) = 0，r₁ = 1，r₂ = 2\n3. 两不等实根：y = C₁e^x + C₂e^(2x)',answer:'y = C₁e^x + C₂e^(2x)',pitfall:'三种特征根情形不要混淆；把系数代入特征方程时注意符号变化',tags:'微分方程,二阶,特征方程'}
+];
+
+/* ================= 数据读写 ================= */
+function seedData(){
+  return {
+    formulas: SEED_F.map(function(o,i){ return normF(Object.assign({id:'f'+(i+1)}, o)); }),
+    examples: SEED_E.map(function(o,i){ return normE(Object.assign({id:'e'+(i+1)}, o)); }),
+    quizStats: {total:0, known:0, unknown:0}
+  };
+}
+function load(){
+  var db = null;
+  try{ db = JSON.parse(localStorage.getItem(KEY)); }catch(e){ db = null; }
+  if(!db || !Array.isArray(db.formulas) || !Array.isArray(db.examples)){
+    db = seedData();
+  }else{
+    db.formulas = db.formulas.filter(function(f){ return f && String(f.name||'').trim(); }).map(normF);
+    db.examples = db.examples.filter(function(e){ return e && String(e.title||'').trim(); }).map(normE);
+  }
+  if(!db.quizStats || typeof db.quizStats !== 'object'){
+    db.quizStats = {total:0, known:0, unknown:0};
+  }else{
+    var s = db.quizStats;
+    db.quizStats = {
+      total: isFinite(s.total) ? Math.max(0, Math.floor(s.total)) : 0,
+      known: isFinite(s.known) ? Math.max(0, Math.floor(s.known)) : 0,
+      unknown: isFinite(s.unknown) ? Math.max(0, Math.floor(s.unknown)) : 0
+    };
+  }
+  return db;
+}
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(db)); }catch(e){ toast('⚠️ 保存失败，存储空间可能已满'); }
+}
+var db = load();
+
+/* ================= UI 状态 ================= */
+var currentTab = 'formulas';
+var fSearch = '', fCat = '全部', fFavOnly = false;
+var eSearch = '', eCat = '全部';
+var quizPool = [], quizPos = 0, quizPhase = 'idle';
+
+/* ================= 工具 ================= */
+var toastTimer = null;
+function toast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2000);
+}
+function tagChips(tags){
+  if(!tags) return '';
+  var arr = String(tags).split(/[,，、\s]+/).filter(Boolean);
+  if(!arr.length) return '';
+  return '<div class="tags">' + arr.map(function(t){ return '<span class="tag">#' + esc(t) + '</span>'; }).join('') + '</div>';
+}
+function stepsHtml(steps){
+  return String(steps||'').split('\n').map(function(s){ return s.trim(); }).filter(Boolean)
+    .map(function(s){ return '<div class="step">' + esc(s) + '</div>'; }).join('');
+}
+function emptyBox(icon, text){
+  return '<div class="empty"><span class="big">' + icon + '</span><p>' + esc(text) + '</p></div>';
+}
+function shuffle(a){
+  for(var i = a.length - 1; i > 0; i--){
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+/* ================= 卡片构建 ================= */
+function formulaCard(f){
+  return '<div class="card">' +
+    '<div class="card-head"><div class="card-title">' + esc(f.name) +
+      ' <span class="badge">' + esc(f.cat) + '</span></div>' +
+      '<button class="star-btn" onclick="toggleFavF(\'' + f.id + '\')" aria-label="收藏">' + (f.fav ? '⭐' : '☆') + '</button></div>' +
+    '<div class="formula-box">' + esc(f.content) + '</div>' +
+    (f.note ? '<p class="note">💡 ' + esc(f.note) + '</p>' : '') +
+    (f.variants ? '<p class="note">🔄 常用变形：' + esc(f.variants) + '</p>' : '') +
+    tagChips(f.tags) +
+    '<div class="btn-row"><button class="btn btn-ghost btn-sm" onclick="openFormulaModal(\'' + f.id + '\')">✏️ 编辑</button>' +
+    '<button class="btn btn-danger btn-sm" onclick="deleteFormula(\'' + f.id + '\')">🗑️ 删除</button></div>' +
+  '</div>';
+}
+function exampleCard(e){
+  return '<div class="card">' +
+    '<div class="card-head"><div class="card-title">' + esc(e.title) +
+      ' <span class="badge">' + esc(e.cat) + '</span></div>' +
+      '<button class="star-btn" onclick="toggleFavE(\'' + e.id + '\')" aria-label="收藏">' + (e.fav ? '⭐' : '☆') + '</button></div>' +
+    '<div class="q-text">' + esc(e.question) + '</div>' +
+    (e.steps ? '<div class="ans-block"><h4>📝 解题步骤</h4>' + stepsHtml(e.steps) + '</div>' : '') +
+    (e.answer ? '<div class="ans-block"><h4>✅ 答案</h4><p class="step">' + esc(e.answer) + '</p></div>' : '') +
+    (e.pitfall ? '<div class="ans-block"><h4>⚠️ 易错点</h4><p class="pit">' + esc(e.pitfall) + '</p></div>' : '') +
+    tagChips(e.tags) +
+    '<div class="btn-row"><button class="btn btn-ghost btn-sm" onclick="openExampleModal(\'' + e.id + '\')">✏️ 编辑</button>' +
+    '<button class="btn btn-danger btn-sm" onclick="deleteExample(\'' + e.id + '\')">🗑️ 删除</button></div>' +
+  '</div>';
+}
+
+/* ================= 渲染 ================= */
+function renderFormulas(){
+  var kw = fSearch.toLowerCase();
+  var list = db.formulas.filter(function(f){
+    if(fFavOnly && !f.fav) return false;
+    if(fCat !== '全部' && f.cat !== fCat) return false;
+    if(!kw) return true;
+    return (f.name + ' ' + f.content + ' ' + f.note + ' ' + f.variants + ' ' + f.tags).toLowerCase().indexOf(kw) >= 0;
+  });
+  document.getElementById('f-count').textContent = '共 ' + list.length + ' 条公式';
+  var el = document.getElementById('formula-list');
+  el.innerHTML = list.length ? list.map(formulaCard).join('') :
+    emptyBox('📚', kw || fCat !== '全部' || fFavOnly ? '没有符合条件的公式' : '还没有公式，点击「添加公式」或恢复预置数据');
+}
+function renderExamples(){
+  var kw = eSearch.toLowerCase();
+  var list = db.examples.filter(function(e){
+    if(eCat !== '全部' && e.cat !== eCat) return false;
+    if(!kw) return true;
+    return (e.title + ' ' + e.question + ' ' + e.answer + ' ' + e.tags).toLowerCase().indexOf(kw) >= 0;
+  });
+  document.getElementById('e-count').textContent = '共 ' + list.length + ' 道例题';
+  var el = document.getElementById('example-list');
+  el.innerHTML = list.length ? list.map(exampleCard).join('') :
+    emptyBox('📝', kw || eCat !== '全部' ? '没有符合条件的例题' : '还没有例题，点击「添加例题」开始积累');
+}
+function renderQuiz(){
+  var s = db.quizStats;
+  // 同步测验轮次与当前题库：删除的题移出队列并刷新为最新内容，避免用旧副本出题记分
+  if(quizPhase === 'question' || quizPhase === 'revealed'){
+    var before = quizPool.length;
+    quizPool = quizPool
+      .filter(function(e){ return db.examples.some(function(x){ return x.id === e.id; }); })
+      .map(function(e){ return db.examples.find(function(x){ return x.id === e.id; }); });
+    if(quizPool.length !== before){
+      if(!quizPool.length){ quizPhase = 'idle'; quizPos = 0; }
+      else if(quizPos >= quizPool.length){ quizPos = quizPool.length - 1; quizPhase = 'question'; }
+      else{ quizPhase = 'question'; }
+    }
+  }
+  var statsEl = document.getElementById('quiz-stats');
+  if(s.total > 0){
+    var acc = s.total ? Math.round(s.known / s.total * 100) : 0;
+    statsEl.innerHTML = '📊 已测验 <b>' + s.total + '</b> 次 · 会了 <b>' + s.known + '</b> · 不会 <b>' + s.unknown + '</b> · 掌握率 <b>' + acc + '%</b>';
+  }else{
+    statsEl.innerHTML = '<span class="hint">暂无测验记录，快去抽题吧～</span>';
+  }
+  var el = document.getElementById('quiz-area');
+  if(quizPhase === 'idle'){
+    el.innerHTML = emptyBox('🎲', '选择题库范围，点击「开始新一轮」开始抽题');
+    return;
+  }
+  if(quizPhase === 'done'){
+    el.innerHTML = '<div class="empty"><span class="big">🎉</span><p>本轮题库已全部抽完！</p><p class="hint">点击「开始新一轮」换一批顺序继续练</p></div>';
+    return;
+  }
+  var ex = quizPool[quizPos];
+  var head = '<div class="card">' +
+    '<div class="card-head"><div class="card-title"><span class="badge">' + esc(ex.cat) + '</span></div>' +
+    '<span class="hint">第 ' + (quizPos + 1) + ' / ' + quizPool.length + ' 题</span></div>' +
+    '<div class="q-text">' + esc(ex.question) + '</div>';
+  if(quizPhase === 'question'){
+    el.innerHTML = head + '<div class="btn-row"><button class="btn btn-primary" onclick="showQuizAnswer()">👁️ 显示答案</button></div></div>';
+  }else{
+    el.innerHTML = head +
+      '<div class="ans-block">' +
+      (ex.steps ? '<h4>📝 解题步骤</h4>' + stepsHtml(ex.steps) : '') +
+      '<h4>✅ 答案</h4><p class="step">' + esc(ex.answer) + '</p>' +
+      (ex.pitfall ? '<h4>⚠️ 易错点</h4><p class="pit">' + esc(ex.pitfall) + '</p>' : '') +
+      '</div>' +
+      '<div class="btn-row"><button class="btn btn-primary" onclick="quizJudge(true)">😀 会了</button>' +
+      '<button class="btn btn-danger" onclick="quizJudge(false)">😣 不会</button></div>' +
+      '</div>';
+  }
+}
+function renderFav(){
+  var fs = db.formulas.filter(function(f){ return f.fav; });
+  var es = db.examples.filter(function(e){ return e.fav; });
+  var el = document.getElementById('fav-area');
+  if(!fs.length && !es.length){
+    el.innerHTML = emptyBox('⭐', '暂无收藏，去公式库或例题库点亮星标吧');
+    return;
+  }
+  var html = '';
+  html += '<div class="section-title">📚 收藏的公式（' + fs.length + '）</div>';
+  html += fs.length ? fs.map(formulaCard).join('') : '<div class="empty" style="padding:16px;"><p>还没有收藏的公式</p></div>';
+  html += '<div class="section-title">📝 收藏的例题（' + es.length + '）</div>';
+  html += es.length ? es.map(exampleCard).join('') : '<div class="empty" style="padding:16px;"><p>还没有收藏的例题</p></div>';
+  el.innerHTML = html;
+}
+function renderSettings(){
+  var s = db.quizStats;
+  document.getElementById('settings-stats').innerHTML =
+    '📚 公式：<b>' + db.formulas.length + '</b> 条　📝 例题：<b>' + db.examples.length + '</b> 道<br>' +
+    '⭐ 收藏：<b>' + (db.formulas.filter(function(f){return f.fav;}).length + db.examples.filter(function(e){return e.fav;}).length) + '</b> 项<br>' +
+    (s.total > 0
+      ? '🎲 测验：<b>' + s.total + '</b> 次 · 会了 ' + s.known + ' · 不会 ' + s.unknown
+      : '<span class="hint">🎲 暂无测验统计，去「随机测验」练几题吧</span>');
+}
+function renderAll(){
+  document.querySelectorAll('.nav-btn').forEach(function(b){
+    b.classList.toggle('active', b.dataset.tab === currentTab);
+  });
+  document.querySelectorAll('.tab-page').forEach(function(p){
+    p.style.display = (p.id === 'tab-' + currentTab) ? 'block' : 'none';
+  });
+  if(currentTab === 'formulas') renderFormulas();
+  else if(currentTab === 'examples') renderExamples();
+  else if(currentTab === 'quiz') renderQuiz();
+  else if(currentTab === 'fav') renderFav();
+  else if(currentTab === 'settings') renderSettings();
+}
+
+/* ================= 公式操作 ================= */
+function toggleFavF(id){
+  var f = db.formulas.find(function(x){ return x.id === id; });
+  if(!f) return;
+  f.fav = !f.fav; save(); renderAll();
+  toast(f.fav ? '⭐ 已收藏' : '☆ 已取消收藏');
+}
+function deleteFormula(id){
+  var f = db.formulas.find(function(x){ return x.id === id; });
+  if(!f) return;
+  if(!confirm('确定删除公式「' + f.name + '」吗？')) return;
+  db.formulas = db.formulas.filter(function(x){ return x.id !== id; });
+  save(); renderAll(); toast('🗑️ 已删除');
+}
+function openFormulaModal(id){
+  var f = id ? db.formulas.find(function(x){ return x.id === id; }) : null;
+  var catOpts = CATS.map(function(c){
+    return '<option value="' + esc(c) + '"' + (f && f.cat === c ? ' selected' : '') + '>' + esc(c) + '</option>';
+  }).join('');
+  document.getElementById('modal-box').innerHTML =
+    '<div class="modal-title">' + (f ? '✏️ 编辑公式' : '➕ 添加公式') + '</div>' +
+    '<form id="f-form">' +
+    '<div class="form-row"><label>名称 *</label><input id="ff-name" required value="' + esc(f ? f.name : '') + '" placeholder="例如：第一个重要极限"></div>' +
+    '<div class="form-row"><label>分类</label><select id="ff-cat">' + catOpts + '</select></div>' +
+    '<div class="form-row"><label>公式内容 *</label><textarea id="ff-content" required placeholder="例如：lim(x→0) sin x / x = 1">' + esc(f ? f.content : '') + '</textarea></div>' +
+    '<div class="form-row"><label>说明</label><textarea id="ff-note" placeholder="使用条件、注意事项等">' + esc(f ? f.note : '') + '</textarea></div>' +
+    '<div class="form-row"><label>常用变形</label><textarea id="ff-variants" placeholder="常用变形公式，多条用分号分隔">' + esc(f ? f.variants : '') + '</textarea></div>' +
+    '<div class="form-row"><label>标签（逗号分隔）</label><input id="ff-tags" value="' + esc(f ? f.tags : '') + '" placeholder="例如：极限,重要极限"></div>' +
+    '<div class="btn-row"><button type="button" class="btn btn-ghost" onclick="closeModal()">取消</button>' +
+    '<button type="submit" class="btn btn-primary">💾 保存</button></div>' +
+    '</form>';
+  document.getElementById('modal-overlay').classList.add('show');
+  document.getElementById('f-form').addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var name = document.getElementById('ff-name').value.trim();
+    var content = document.getElementById('ff-content').value.trim();
+    if(!name || !content){ toast('⚠️ 名称和公式内容不能为空'); return; }
+    var data = {
+      name: name,
+      cat: document.getElementById('ff-cat').value,
+      content: content,
+      note: document.getElementById('ff-note').value.trim(),
+      variants: document.getElementById('ff-variants').value.trim(),
+      tags: document.getElementById('ff-tags').value.trim()
+    };
+    if(f){ Object.assign(f, data); toast('✅ 已保存'); }
+    else{ db.formulas.unshift(normF(data)); toast('✅ 已添加'); }
+    save(); closeModal(); renderAll();
+  });
+}
+
+/* ================= 例题操作 ================= */
+function toggleFavE(id){
+  var e = db.examples.find(function(x){ return x.id === id; });
+  if(!e) return;
+  e.fav = !e.fav; save(); renderAll();
+  toast(e.fav ? '⭐ 已收藏' : '☆ 已取消收藏');
+}
+function deleteExample(id){
+  var e = db.examples.find(function(x){ return x.id === id; });
+  if(!e) return;
+  if(!confirm('确定删除例题「' + e.title + '」吗？')) return;
+  db.examples = db.examples.filter(function(x){ return x.id !== id; });
+  save(); renderAll(); toast('🗑️ 已删除');
+}
+function openExampleModal(id){
+  var e = id ? db.examples.find(function(x){ return x.id === id; }) : null;
+  var catOpts = CATS.map(function(c){
+    return '<option value="' + esc(c) + '"' + (e && e.cat === c ? ' selected' : '') + '>' + esc(c) + '</option>';
+  }).join('');
+  document.getElementById('modal-box').innerHTML =
+    '<div class="modal-title">' + (e ? '✏️ 编辑例题' : '➕ 添加例题') + '</div>' +
+    '<form id="e-form">' +
+    '<div class="form-row"><label>标题 *</label><input id="ef-title" required value="' + esc(e ? e.title : '') + '" placeholder="例如：重要极限求值"></div>' +
+    '<div class="form-row"><label>分类</label><select id="ef-cat">' + catOpts + '</select></div>' +
+    '<div class="form-row"><label>题目 *</label><textarea id="ef-question" required placeholder="题目描述">' + esc(e ? e.question : '') + '</textarea></div>' +
+    '<div class="form-row"><label>解题步骤（每行一步）</label><textarea id="ef-steps" placeholder="1. ...&#10;2. ...&#10;3. ...">' + esc(e ? e.steps : '') + '</textarea></div>' +
+    '<div class="form-row"><label>答案 *</label><input id="ef-answer" required value="' + esc(e ? e.answer : '') + '"></div>' +
+    '<div class="form-row"><label>易错点</label><textarea id="ef-pitfall">' + esc(e ? e.pitfall : '') + '</textarea></div>' +
+    '<div class="form-row"><label>标签（逗号分隔）</label><input id="ef-tags" value="' + esc(e ? e.tags : '') + '" placeholder="例如：极限,重要极限"></div>' +
+    '<div class="btn-row"><button type="button" class="btn btn-ghost" onclick="closeModal()">取消</button>' +
+    '<button type="submit" class="btn btn-primary">💾 保存</button></div>' +
+    '</form>';
+  document.getElementById('modal-overlay').classList.add('show');
+  document.getElementById('e-form').addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var title = document.getElementById('ef-title').value.trim();
+    var question = document.getElementById('ef-question').value.trim();
+    var answer = document.getElementById('ef-answer').value.trim();
+    if(!title || !question || !answer){ toast('⚠️ 标题、题目、答案不能为空'); return; }
+    var data = {
+      title: title,
+      cat: document.getElementById('ef-cat').value,
+      question: question,
+      steps: document.getElementById('ef-steps').value.trim(),
+      answer: answer,
+      pitfall: document.getElementById('ef-pitfall').value.trim(),
+      tags: document.getElementById('ef-tags').value.trim()
+    };
+    if(e){ Object.assign(e, data); toast('✅ 已保存'); }
+    else{ db.examples.unshift(normE(data)); toast('✅ 已添加'); }
+    save(); closeModal(); renderAll();
+  });
+}
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('show');
+  document.getElementById('modal-box').innerHTML = '';
+}
+
+/* ================= 随机测验 ================= */
+function buildQuizScope(){
+  var sel = document.getElementById('quiz-scope');
+  var html = '<option value="all">全部例题</option><option value="fav">⭐ 只看收藏</option>';
+  html += CATS.map(function(c){ return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join('');
+  sel.innerHTML = html;
+}
+function startQuiz(){
+  var scope = document.getElementById('quiz-scope').value;
+  var pool = db.examples.slice();
+  if(scope === 'fav') pool = pool.filter(function(e){ return e.fav; });
+  else if(scope !== 'all') pool = pool.filter(function(e){ return e.cat === scope; });
+  if(!pool.length){
+    quizPhase = 'idle'; quizPool = [];
+    renderQuiz();
+    toast('⚠️ 该范围内没有例题');
+    return;
+  }
+  shuffle(pool);
+  quizPool = pool; quizPos = 0; quizPhase = 'question';
+  renderQuiz();
+}
+function showQuizAnswer(){ quizPhase = 'revealed'; renderQuiz(); }
+function quizJudge(known){
+  var s = db.quizStats;
+  s.total++;
+  if(known) s.known++; else s.unknown++;
+  save();
+  quizPos++;
+  quizPhase = (quizPos >= quizPool.length) ? 'done' : 'question';
+  renderQuiz();
+  toast(known ? '😀 已记录：会了' : '📝 已记录：不会，继续加油');
+}
+
+/* ================= 设置 ================= */
+function exportData(){
+  try{
+    var blob = new Blob([JSON.stringify(db, null, 2)], {type:'application/json'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'math_formula_backup_' + new Date().toISOString().slice(0,10) + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+    toast('📤 已导出 JSON 文件');
+  }catch(e){ toast('❌ 导出失败'); }
+}
+var pendingImport = null;
+function setImportButtons(enabled){
+  document.getElementById('btn-merge').disabled = !enabled;
+  document.getElementById('btn-overwrite').disabled = !enabled;
+}
+function normalizeImport(d){
+  var res = {formulas:[], examples:[], quizStats:null};
+  if(d && Array.isArray(d.formulas)){
+    res.formulas = d.formulas.filter(function(f){ return f && String(f.name||'').trim(); }).map(normF);
+  }
+  if(d && Array.isArray(d.examples)){
+    res.examples = d.examples.filter(function(e){ return e && String(e.title||'').trim(); }).map(normE);
+  }
+  if(d && d.quizStats && typeof d.quizStats === 'object' && isFinite(d.quizStats.total)){
+    res.quizStats = {
+      total: Math.max(0, Math.floor(d.quizStats.total)) || 0,
+      known: Math.max(0, Math.floor(d.quizStats.known)) || 0,
+      unknown: Math.max(0, Math.floor(d.quizStats.unknown)) || 0
+    };
+  }
+  return res;
+}
+function onImportFile(input){
+  var file = input.files && input.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(){
+    try{
+      var d = JSON.parse(reader.result);
+      pendingImport = normalizeImport(d);
+      if(!pendingImport.formulas.length && !pendingImport.examples.length){
+        pendingImport = null;
+        setImportButtons(false);
+        toast('❌ 文件中没有有效的公式或例题');
+        return;
+      }
+      setImportButtons(true);
+      toast('📄 读取成功：公式 ' + pendingImport.formulas.length + ' 条，例题 ' + pendingImport.examples.length + ' 条，请选择导入方式');
+    }catch(e){
+      pendingImport = null;
+      setImportButtons(false);
+      toast('❌ JSON 解析失败');
+    }
+  };
+  reader.onerror = function(){ toast('❌ 文件读取失败'); };
+  reader.readAsText(file);
+}
+function mergeImport(){
+  if(!pendingImport) return;
+  var fid = {}, eid = {};
+  db.formulas.forEach(function(f){ fid[f.id] = true; });
+  db.examples.forEach(function(e){ eid[e.id] = true; });
+  var addF = 0, addE = 0;
+  pendingImport.formulas.forEach(function(f){
+    if(!fid[f.id]){ db.formulas.push(f); fid[f.id] = true; addF++; }
+  });
+  pendingImport.examples.forEach(function(e){
+    if(!eid[e.id]){ db.examples.push(e); eid[e.id] = true; addE++; }
+  });
+  save(); pendingImport = null; setImportButtons(false);
+  document.getElementById('import-file').value = '';
+  renderAll();
+  toast('✅ 合并完成：新增公式 ' + addF + ' 条、例题 ' + addE + ' 道');
+}
+function overwriteImport(){
+  if(!pendingImport) return;
+  if(!confirm('⚠️ 覆盖导入将完全替换现有公式和例题，确定继续吗？')) return;
+  if(pendingImport.formulas.length) db.formulas = pendingImport.formulas;
+  if(pendingImport.examples.length) db.examples = pendingImport.examples;
+  if(pendingImport.quizStats) db.quizStats = pendingImport.quizStats;
+  save(); pendingImport = null; setImportButtons(false);
+  document.getElementById('import-file').value = '';
+  renderAll();
+  toast('✅ 覆盖导入完成');
+}
+var clearArmed = false, clearTimer = null;
+function resetClearBtn(){
+  clearArmed = false;
+  clearTimeout(clearTimer);
+  var btn = document.getElementById('btn-clear');
+  btn.textContent = '🗑️ 清空所有数据';
+  btn.classList.remove('armed');
+}
+function clearAll(){
+  var btn = document.getElementById('btn-clear');
+  if(!clearArmed){
+    clearArmed = true;
+    btn.textContent = '⚠️ 再点一次确认清空！';
+    btn.classList.add('armed');
+    clearTimer = setTimeout(resetClearBtn, 4000);
+    return;
+  }
+  resetClearBtn();
+  db = {formulas:[], examples:[], quizStats:{total:0, known:0, unknown:0}};
+  save();
+  quizPhase = 'idle'; quizPool = []; quizPos = 0;
+  renderAll();
+  toast('🗑️ 已清空所有数据');
+}
+
+/* ================= 初始化 ================= */
+function buildCatSelect(id, withFav){
+  var sel = document.getElementById(id);
+  var html = '<option value="全部">全部分类</option>';
+  html += CATS.map(function(c){ return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join('');
+  sel.innerHTML = html;
+}
+function init(){
+  buildCatSelect('f-cat');
+  buildCatSelect('e-cat');
+  buildQuizScope();
+
+  document.querySelectorAll('.nav-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      currentTab = b.dataset.tab;
+      renderAll();
+      window.scrollTo(0, 0);
+    });
+  });
+  document.getElementById('f-search').addEventListener('input', function(){
+    fSearch = this.value.trim(); renderFormulas();
+  });
+  document.getElementById('f-cat').addEventListener('change', function(){
+    fCat = this.value; renderFormulas();
+  });
+  document.getElementById('f-favbtn').addEventListener('click', function(){
+    fFavOnly = !fFavOnly;
+    this.classList.toggle('active', fFavOnly);
+    renderFormulas();
+  });
+  document.getElementById('e-search').addEventListener('input', function(){
+    eSearch = this.value.trim(); renderExamples();
+  });
+  document.getElementById('e-cat').addEventListener('change', function(){
+    eCat = this.value; renderExamples();
+  });
+  document.getElementById('quiz-scope').addEventListener('change', function(){
+    quizPhase = 'idle'; quizPool = []; quizPos = 0;
+    renderQuiz();
+  });
+  document.getElementById('modal-overlay').addEventListener('click', function(ev){
+    if(ev.target === this) closeModal();
+  });
+
+  renderAll();
+}
+init();
+</script>
+</body>
+</html>
